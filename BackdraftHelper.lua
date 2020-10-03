@@ -76,16 +76,6 @@ function Addon:UpdateActionButtons()
     end
 end
 
-function Addon:HideButtonOverlays()
-    for button, _ in pairs(self.buttons) do
-        if (button.overlay and button.overlay:IsVisible()) then
-            button.overlay.animOut:Play()
-
-            ActionButton_HideOverlayGlow(button)
-        end
-    end
-end
-
 function Addon:ToggleButtonOverlays()
     self.buffs = {}
 
