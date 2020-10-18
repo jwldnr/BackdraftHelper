@@ -2,7 +2,10 @@ local AddonName, Addon = ...
 
 -- locals and speed
 local select = select
+local pairs = pairs
 
+local _G = _G
+local CreateFrame = CreateFrame
 local UnitBuff = UnitBuff
 
 local ActionButton_ShowOverlayGlow = ActionButton_ShowOverlayGlow
@@ -33,6 +36,18 @@ local ABILITIES = {
     ["Incinerate"] = true
 }
 
+-- main
+function Addon:Load()
+    self.frame = CreateFrame("Frame", nil)
+    
+    self.frame:SetScript("OnEvent", function(_, ...)
+        self:OnEvent(...)
+    end)
+
+    self.frame:RegisterEvent("ADDON_LOADED")
+    self.frame:RegisterEvent("PLAYER_LOGIN")
+end
+
 function Addon:OnEvent(event, ...)
     local action = self[event]
   
@@ -54,7 +69,7 @@ end
 function Addon:UpdateActionButtons()
     self.buttons = {}
 
-    for _, template in ipairs(ACTION_BUTTON_TEMPLATES) do
+    for _, template in pairs(ACTION_BUTTON_TEMPLATES) do
         for i = 1, 12 do
             local button = _G[template..i]
             local type, id = GetActionInfo(button.action)
@@ -101,12 +116,12 @@ function Addon:ToggleButtonOverlays()
 end
 
 function Addon:ADDON_LOADED(name)
-    if (AddonName == name) then
+    if (name == AddonName) then
+        self.frame:RegisterUnitEvent("UNIT_AURA", UNIT_TAG_PLAYER)
+
+        print(name, "loaded")
+
         self.frame:UnregisterEvent("ADDON_LOADED")
-
-        self.class = select(2, UnitClass(UNIT_TAG_PLAYER))
-
-        print(AddonName, "loaded")
     end
 end
 
@@ -115,22 +130,12 @@ function Addon:UNIT_AURA()
     self:ToggleButtonOverlays()
 end
 
-function Addon:PLAYER_ENTERING_WORLD()
+function Addon:PLAYER_LOGIN()
     self:UpdateActionButtons()
     self:ToggleButtonOverlays()
+
+    self.frame:UnregisterEvent("PLAYER_LOGIN")
 end
 
-function Addon:Load()
-    self.frame = CreateFrame("Frame", nil)
-    
-    self.frame:SetScript("OnEvent", function(_, ...)
-        self:OnEvent(...)
-    end)
-
-    self.frame:RegisterEvent("ADDON_LOADED")
-    self.frame:RegisterEvent("PLAYER_ENTERING_WORLD")
-
-    self.frame:RegisterUnitEvent("UNIT_AURA", UNIT_TAG_PLAYER)
-end
-
+-- begin
 Addon:Load()
