@@ -83,7 +83,9 @@ function Addon:ToggleButtonOverlays()
     local buff = UnitBuff(UNIT_TAG_PLAYER, i)
 
     while (buff) do
-        self.buffs[#self.buffs + 1] = buff
+        if (buff == BACKDRAFT) then
+            self.buffs[#self.buffs + 1] = buff
+        end
 
         i = i + 1
         buff = UnitBuff(UNIT_TAG_PLAYER, i)
